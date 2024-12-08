@@ -20,7 +20,9 @@ main_menu() {
 			list_databases
 			break
 			;;
-			"Connect To Databases") echo "Hi from connect to databases"
+			"Connect To Databases") 
+			clear
+			connect_database
 			break
 			;;
 			"Drop Database") echo 
@@ -40,9 +42,9 @@ main_menu() {
 
 # Create Database
 create_database() {
-    read -p "Please enter a name for the database: " database_name
+    read -p "Enter a name for the database: " database_name
 
-    #if find "$DATABASES_DIR" -type f -name "$database_name.txt" > /dev/null 2>&1; then
+
 	if [ -d "$DATABASES_DIR/$database_name" ]; then 
         echo "This Name Already Exists!"
     else
@@ -83,7 +85,7 @@ list_databases() {
 # Drop Database
 drop_database() {
 
-	read -p "Please enter database name to delete: " db_name
+	read -p "Enter database name to delete: " db_name
 	db_dir="$DATABASES_DIR/$db_name"
 
 	if [ ! -d "$db_dir" ]; then
@@ -91,7 +93,7 @@ drop_database() {
 		return
 	fi
 
-	read -p "Are you sure want to delete $db_name ? (y/n)" choice	
+	read -p "Are you sure want to delete $db_name ? (y/n): " choice	
 	if [[ "$choice" == 'y' || "$choice" == 'Y' ]]; then
 		rm -rf "$db_dir"
 		echo "Database $db_name has beed deleted."
@@ -104,6 +106,47 @@ drop_database() {
 		clear 
 		main_menu
 	fi
+}
+
+# Connect Database
+connect_database(){
+	echo "==================================" 
+	echo " Available Databases To Connect " 
+	echo "=================================="
+	count=0
+	databased=()
+	for dir in "$DATABASES_DIR"/*/; do
+		if [ -d "$dir" ]; then
+			count=$((count + 1))
+			dir_name=$(basename "$dir")
+			databases+=("$dir_name")
+			echo "$count. $dir_name"
+		fi
+	done
+	echo "=================================="
+
+	if [ $count -eq 0 ]; then
+		echo "No Available Databases."
+		return
+	fi
+
+	read -p "Enter the number of the database you want to connect: " choice
+
+	if [[ "$choice" -ge 1 && "$choice" -le "$count" ]]; then
+		selected_db="${databases[$choice-1]}"
+		clear
+		db_menu "$selected_db"
+	else 
+        echo "Invalid selection. Please choose a valid database number."
+		read -p "Press Enter to try again."
+		clear
+		connect_database
+	fi
+}
+
+# Database Menu
+db_menu(){
+	echo "Welcome Here you can manage Database $1 "
 }
 
 # Start the main menu
