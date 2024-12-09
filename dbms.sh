@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Global Variables
-DATABASES_DIR="/home/dodger/Bash_Project/databases"
+SCRIPT_DIR="$(dirname "$(realpath "$BASH_SOURCE")")"
+DATABASES_DIR="$SCRIPT_DIR/databases"
 PS3="Please enter your choice: "
 
 # Main Menu 
@@ -32,7 +33,7 @@ main_menu() {
 			;;
 			"Quit") 
 				echo "Exiting the program.."
-				break
+				exit 0
 				;;
 			*) echo "Invalid Choice."
 			;;
@@ -42,6 +43,13 @@ main_menu() {
 
 # Create Database
 create_database() {
+
+	if [[ ! -d "$DATABASES_DIR" ]]; then
+        echo "Database directory does not exist. Creating it..."
+        mkdir "$DATABASES_DIR"
+		echo "Created databases dir successfully in current directory." 
+    fi
+
     read -p "Enter a name for the database: " database_name
 
 
@@ -146,7 +154,63 @@ connect_database(){
 
 # Database Menu
 db_menu(){
-	echo "Welcome Here you can manage Database $1 "
+	db_name="$1"
+	echo "=================================="
+	echo "Connected To Database $db_name "
+	echo "=================================="
+	
+	select option in "Create Table" "List Tables" "Insert into Table" "Select From Table" "Delete From Table" "Update Table" "Main Menu"
+	do 
+		case $option in 
+			"Create Table")
+			clear
+			create_table "$db_name"
+			break
+			;;
+			"List Tables") echo "Hi from List tables"
+			break
+			;;
+			"Insert into Table") echo "Hi from insert into"
+			break
+			;;
+			"Delete From Table") echo "Hi from Delete from"
+			break
+			;;
+			"Update Table") echo "Hi from update"
+			break
+			;;
+			"Main Menu")
+			clear
+			main_menu
+			;;
+		esac
+	done 
+			
+
+}
+
+# Create Table
+create_table() {
+	db_name="$1"
+	DB_PATH="$DATABASES_DIR/$db_name/"
+	
+	#! 
+	if [[ ! -d "$DB_PATH" ]]; then
+        echo "Database $db_name does not exist. Please create the database first."
+        return
+    fi
+
+	read -p "Enter a name for the table: " table_name
+
+	if [[ -f "$DB_PATH/$table_name.txt" ]]; then
+		echo "This Name Already Exists!"
+	else
+		touch "$DB_PATH/$table_name.txt"
+		echo "Table '$table_name' created successfully."
+	fi
+	read -p "Press Enter to return to your database page..."
+    clear
+    db_menu "$db_name"
 }
 
 # Start the main menu
