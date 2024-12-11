@@ -205,8 +205,11 @@ create_table() {
 	if [[ -f "$DB_PATH/$table_name.txt" ]]; then
 		echo "This Name Already Exists!"
 	else
-		touch "$DB_PATH/$table_name.txt"
-		echo "Table '$table_name' created successfully."
+		# run the create table script
+		main_script_dir=$(dirname "$(realpath "$BASH_SOURCE")")
+		create_script_path="$main_script_dir/create_table.sh"
+		chmod +x "$create_script_path"
+		bash "$create_script_path" "$db_name" "$table_name"
 	fi
 	read -p "Press Enter to return to your database page..."
     clear
