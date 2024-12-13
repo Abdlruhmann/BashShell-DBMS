@@ -14,7 +14,7 @@ read -p "Enter the number of columns: " num_columns
 table_file="$DB_PATH/$table_name.txt"
 touch "$table_file"
 
-table_name_metadata="table_name_metadata.txt"
+table_name_metadata="${table_name}_metadata.txt"
 metadata_file="$DB_PATH/$table_name_metadata"
 touch "$metadata_file"
 

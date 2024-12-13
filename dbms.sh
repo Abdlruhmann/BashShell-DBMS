@@ -167,10 +167,14 @@ db_menu(){
 			create_table "$db_name"
 			break
 			;;
-			"List Tables") echo "Hi from List tables"
+			"List Tables")
+			clear
+			list_tables "$db_name"
 			break
 			;;
-			"Insert into Table") echo "Hi from insert into"
+			"Insert into Table")
+			clear
+			insert_into "$db_name"
 			break
 			;;
 			"Delete From Table") echo "Hi from Delete from"
@@ -216,6 +220,48 @@ create_table() {
     db_menu "$db_name"
 }
 
+# List tables
+list_tables() {
+	echo "==================================" 
+	echo " Available Tables in Database $1 " 
+	echo "=================================="
+	count=0
+	db_name="$1"
+	for file in "$DATABASES_DIR/$db_name"/*; do
+		if [ -f "$file" ]&& [[ ! "$file" =~ _metadata\.txt$ ]]; then
+			count=$((count + 1))
+			file_name=$(basename "$file")
+			tables+=("$file_name")
+			echo "$count. $file_name"
+		fi
+	done
+
+	if [ $count -eq 0 ]; then
+		echo "No Tables Yet."
+	fi
+
+	echo "==================================" 
+	echo
+	read -p "Press Enter to return to the main menu..." 
+	clear 
+	main_menu
+}
+
+# Insert into table
+insert_into() {
+	db_name="$1"
+	
+	#Run insert_into script
+	main_script_dir=$(dirname "$(realpath "$BASH_SOURCE")")
+	insert_into_script="$main_script_dir/insert_into.sh"
+
+	chmod +x "$insert_into_script"
+	bash "$insert_into_script" "$db_name" "$DATABASES_DIR" 
+	
+	read -p "Press Enter to return to your database page..."
+    clear
+    db_menu "$db_name"
+}
 # Start the main menu
 clear
 main_menu
