@@ -159,7 +159,7 @@ db_menu(){
 	echo "Connected To Database $db_name "
 	echo "=================================="
 	
-	select option in "Create Table" "List Tables" "Insert into Table" "Select From Table" "Delete From Table" "Update Table" "Main Menu"
+	select option in "Create Table" "List Tables" "Insert into Table" "Select From Table" "Delete From Table" "Update Table" "Drop Table" "Main Menu"
 	do 
 		case $option in 
 			"Create Table")
@@ -177,11 +177,19 @@ db_menu(){
 			insert_into "$db_name"
 			break
 			;;
+			"Select From Table")
+			clear
+			select_from "$db_name"
+			;;
 			"Delete From Table") echo "Hi from Delete from"
 			break
 			;;
 			"Update Table") echo "Hi from update"
 			break
+			;;
+			"Drop Table")
+			clear
+			drop_table "$db_name"
 			;;
 			"Main Menu")
 			clear
@@ -225,7 +233,7 @@ list_tables() {
 	echo "==================================" 
 	echo " Available Tables in Database $1 " 
 	echo "=================================="
-	count=0
+	local count=0
 	db_name="$1"
 	for file in "$DATABASES_DIR/$db_name"/*; do
 		if [ -f "$file" ]&& [[ ! "$file" =~ _metadata\.txt$ ]]; then
@@ -250,13 +258,45 @@ list_tables() {
 # Insert into table
 insert_into() {
 	db_name="$1"
-	
 	#Run insert_into script
 	main_script_dir=$(dirname "$(realpath "$BASH_SOURCE")")
 	insert_into_script="$main_script_dir/insert_into.sh"
 
 	chmod +x "$insert_into_script"
 	bash "$insert_into_script" "$db_name" "$DATABASES_DIR" 
+	
+	read -p "Press Enter to return to your database page..."
+    clear
+    db_menu "$db_name"
+}
+
+# Select from table
+#select_from() {
+	
+#}
+
+# Drop Table
+drop_table() {
+	read -p "Enter table name you want to drop: " table_name
+	local db_name="$1"
+	local table_file="$DATABASES_DIR/$db_name/$table_name.txt"
+	local metadata_file="$DATABASES_DIR/$db_name/${table_name}_metadata.txt"
+	echo "$db_name"
+	echo "$table_file"
+	if [[ -f "$table_file" && -f "$metadata_file" ]]; then
+		read -p "Are you sure want to drop table: $table_name ? (y/n): " confirm
+		if [[ "$confirm" == "y" || "$confirm" == "y" ]]; then
+			if rm "$table_file" "$metadata_file" 2>/dev/null; then
+				echo "Table "$table_name" and its metadata file have been dropped successfully!"
+			else 
+				echo "Failed to drop table $table_name ."
+			fi
+		else 
+			echo "Drop table operation has been cancelled!"
+		fi
+	else
+		echo "Table $table_name Dose not exits!"
+	fi
 	
 	read -p "Press Enter to return to your database page..."
     clear

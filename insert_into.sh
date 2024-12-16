@@ -40,22 +40,27 @@ db_name="$1"
             index=$((index + 1))
         done < "$selected_table_metadata"
 
-        # Ask the user to input values for each column, and validate data types
+        #user input / validation
         user_input_columns=()
         for i in "${!column_names[@]}"; do
             column_name="${column_names[$i]}"
             expected_datatype="${column_datatypes[$i]}"
             valid_input=false
 
-            if [ "$i" -eq 0 ]; then # Auto-increment ID 
-                last_line=$(tail -n 1 "${selected_table_file}.txt") 
-                if [ -z "$last_line" ]; then 
-                    next_id=1 
-                else 
-                    last_id=$(echo "$last_line" | awk -F, '{print $1}') 
-                    next_id=$((last_id + 1)) 
-                fi 
-                user_input_columns+=("$next_id") 
+            if [ "$i" -eq 0 ]; then 
+                while [ "$valid_input" == false ]; do
+                    read -p "Enter unique value for primary key $column_name: " user_input
+                    if [[ "$user_input" =~ ^-?[0-9]+$ ]]; then
+                        if grep  -q "^$user_input," "$selected_table_file.txt"; then
+                            echo "Invalid Input : Primary Key must be unique. ID $user_input already exists."
+                        else
+                            valid_input=true
+                        fi
+                    else 
+                        echo "Invalid input: Primary Key exepcts an integer."
+                    fi
+                done
+                user_input_columns+=("$user_input") 
                 continue 
             fi
 
@@ -64,7 +69,6 @@ db_name="$1"
 
                 case "$expected_datatype" in
                     VARCHAR)
-                        # Accept any non-empty string for VARCHAR
                         if [[ -n "$user_input" ]]; then
                             valid_input=true
                         else
@@ -72,7 +76,6 @@ db_name="$1"
                         fi
                         ;;
                     INT)
-                        # Validate integer input
                         if [[ "$user_input" =~ ^-?[0-9]+$ ]]; then
                             valid_input=true
                         else
@@ -80,7 +83,7 @@ db_name="$1"
                         fi
                         ;;
                     FLOAT)
-                        # Validate float input
+
                         if [[ "$user_input" =~ ^-?[0-9]+\.[0-9]+$ ]]; then
                             valid_input=true
                         else
@@ -88,7 +91,6 @@ db_name="$1"
                         fi
                         ;;
                     DATE)
-                        # Validate date format (YYYY-MM-DD)
                         if [[ "$user_input" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
                             valid_input=true
                         else
@@ -104,7 +106,7 @@ db_name="$1"
                         ;;
                     *)
                         echo "Unknown datatype: $expected_datatype"
-                        valid_input=true  # exit loop for unrecognized types (but you may add more validation here)
+                        valid_input=true 
                         ;;
                 esac
             done
@@ -112,7 +114,7 @@ db_name="$1"
         done
 
 
-        # If all inputs are valid, write the new values to the table file
+        # writing into table
         echo "Inserting into table $selected_table..."
         echo "$(IFS=,; echo "${user_input_columns[*]}")" >> "${selected_table_file}.txt"
         echo "Data inserted successfully."
