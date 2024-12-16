@@ -1,3 +1,0 @@
-id:INT
-name:VARCHAR
-Joined_at:DATE

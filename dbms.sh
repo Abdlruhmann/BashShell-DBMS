@@ -212,7 +212,14 @@ create_table() {
         return
     fi
 
-	read -p "Enter a name for the table: " table_name
+	while true; do
+		read -p "Enter a name for the table: " table_name
+		if [[ -n "$table_name" ]]; then
+			break
+		else 
+			echo "Table Name Cannot be Blank!"
+		fi
+	done
 
 	if [[ -f "$DB_PATH/$table_name.txt" ]]; then
 		echo "This Name Already Exists!"
@@ -297,7 +304,7 @@ drop_table() {
 	else
 		echo "Table $table_name Dose not exits!"
 	fi
-	
+
 	read -p "Press Enter to return to your database page..."
     clear
     db_menu "$db_name"
