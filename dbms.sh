@@ -179,7 +179,7 @@ db_menu(){
 			;;
 			"Select From Table")
 			clear
-			select_from "$db_name"
+			select_from "$db_name" 
 			;;
 			"Delete From Table") echo "Hi from Delete from"
 			break
@@ -278,9 +278,18 @@ insert_into() {
 }
 
 # Select from table
-#select_from() {
-	
-#}
+select_from() {
+	db_name="$1"
+	select_script="$SCRIPT_DIR/select_from.sh"
+
+	chmod +x "$select_script"
+	bash "$select_script" "$db_name" "$DATABASES_DIR"
+}
+
+# Delete from table
+
+
+# Update Table
 
 # Drop Table
 drop_table() {

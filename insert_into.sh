@@ -3,7 +3,6 @@ SCRIPT_DIR="$(dirname "$(realpath "$BASH_SOURCE")")"
 DATABASES_DIR="$2"
 db_name="$1"
 
-    echo "$DATABASE_DIR"
     echo "==================================" 
 	echo " Available Tables in Database $1 " 
 	echo "=================================="
