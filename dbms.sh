@@ -181,10 +181,14 @@ db_menu(){
 			clear
 			select_from "$db_name" 
 			;;
-			"Delete From Table") echo "Hi from Delete from"
+			"Delete From Table")
+			clear
+			delete_from "$db_name"
 			break
 			;;
-			"Update Table") echo "Hi from update"
+			"Update Table")
+			clear
+			update_table "$db_name"
 			break
 			;;
 			"Drop Table")
@@ -284,12 +288,37 @@ select_from() {
 
 	chmod +x "$select_script"
 	bash "$select_script" "$db_name" "$DATABASES_DIR"
+
+	read -p "Press Enter to return to your database page..."
+    clear
+    db_menu "$db_name"
 }
 
 # Delete from table
+delete_from() {
+	db_name= "$1"
+	delete_script="$SCRIPT_DIR/delete_from.sh"
 
+	chmod +x "$delete_script"
+	bash "$delete_script" "$db_name" "$DATABASES_DIR"
+
+	read -p "Press Enter to return to your database page..."
+    clear
+    db_menu "$db_name"
+}
 
 # Update Table
+update_table() {
+	db_name= "$1"
+	update_script="$SCRIPT_DIR/update_table.sh"
+
+	chmod +x "$update_script"
+	bash "$update_script" "$db_name" "$DATABASES_DIR"
+
+	read -p "Press Enter to return to your database page..."
+    clear
+    db_menu "$db_name"
+}
 
 # Drop Table
 drop_table() {

@@ -28,9 +28,6 @@ if [[ "$choice" -ge 1 && "$choice" -le "$count" ]]; then
 	selected_table_file="$DATABASES_DIR/$db_name/${selected_table}.txt"
     selected_table_metadata="$DATABASES_DIR/$db_name/${selected_table}_metadata.txt"
 fi
-    # Delete me
-    echo "$selected_table_file"
-    echo "$selected_table_metadata"
 
 if [[ ! -f "$selected_table_file" || ! -f "$selected_table_metadata" ]]; then
     echo "Table or metadata file is not exits"
